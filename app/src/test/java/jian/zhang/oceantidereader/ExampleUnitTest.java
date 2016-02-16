@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrary;
+package jian.zhang.oceanwithlibrarys;
 
 import org.junit.Test;
 
