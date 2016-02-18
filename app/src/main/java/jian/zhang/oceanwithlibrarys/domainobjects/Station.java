@@ -5,9 +5,9 @@ import android.os.Parcelable;
 
 public class Station implements Parcelable {
     private long mId;
-    private String mStateName;
-    private String mStationId;
-    private String mName;
+    private String state_name;
+    private String id;
+    private String name;
     private String mFavorite;
 
     public Station(){}
@@ -17,11 +17,11 @@ public class Station implements Parcelable {
     }
 
     public String getStateName() {
-        return mStateName;
+        return state_name;
     }
 
     public void setStateName(String stateName) {
-        mStateName = stateName;
+        state_name = stateName;
     }
 
     public long getId() {
@@ -33,19 +33,19 @@ public class Station implements Parcelable {
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public void setName(String name) {
-        mName = name;
+        this.name = name;
     }
 
     public String getStationId() {
-        return mStationId;
+        return id;
     }
 
     public void setStationId(String stationId) {
-        mStationId = stationId;
+        id = stationId;
     }
 
     public String getFavorite() {
@@ -64,17 +64,17 @@ public class Station implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(mId);
-        dest.writeString(mStateName);
-        dest.writeString(mStationId);
-        dest.writeString(mName);
+        dest.writeString(state_name);
+        dest.writeString(id);
+        dest.writeString(name);
         dest.writeString(mFavorite);
     }
 
     private void readFromParcel(Parcel in) {
         mId = in.readLong();
-        mStateName = in.readString();
-        mStationId = in.readString();
-        mName = in.readString();
+        state_name = in.readString();
+        id = in.readString();
+        name = in.readString();
         mFavorite = in.readString();
     }
 

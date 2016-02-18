@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
@@ -35,7 +37,9 @@ import jian.zhang.oceanwithlibrarys.utils.Utils;
  */
 public class StateListFragment extends Fragment implements StateListActivity.Callback {
 
-    private RecyclerView mStateRecyclerView;
+    @Bind(R.id.state_list)
+    RecyclerView mStateRecyclerView;
+
     private boolean mMultiplePane;
     private Context mContext;
 
@@ -68,7 +72,8 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.state_list_fragment, container, false);
-        initRecyclerView(rootView);
+        ButterKnife.bind(this, rootView);
+        initRecyclerView();
         registerDataLoadedReceiver();
         initActions();
         return rootView;
@@ -158,8 +163,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         }
     }
 
-    private void initRecyclerView(View rootView) {
-        mStateRecyclerView = (RecyclerView) rootView.findViewById(R.id.state_list);
+    private void initRecyclerView() {
         mStateRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 

@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,6 +22,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
@@ -30,7 +32,9 @@ import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
 
 public class StateListActivity extends AppCompatActivity{
 
-    private ProgressBar mProgressBar;
+    @Bind(R.id.progress_bar)
+    ProgressBar mProgressBar;
+
     private boolean mMultiplePane;
     private ProgressDialog mProgressDialog;
     private Callback mCallback;
@@ -56,6 +60,8 @@ public class StateListActivity extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.state_list_activity);
+        ButterKnife.bind(this);
+
         initVariables();
         registerDataLoadedReceiver();
         initViews();
@@ -91,11 +97,6 @@ public class StateListActivity extends AppCompatActivity{
         }
     };
 
-    private void onButtonClicked() {
-        if (mCallback != null) {
-            mCallback.onFavButtonClicked();
-        }
-    }
 
     private void startStateListFragment() {
         FragmentManager manager = getSupportFragmentManager();
@@ -110,10 +111,17 @@ public class StateListActivity extends AppCompatActivity{
     }
 
     private void initViews() {
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         setupToolbar();
-        setupFloatingButton();
         startStateListFragment();
+    }
+
+    @OnClick(R.id.fab)
+    void onFabClicked(){
+        // Go to the station list view but only show all the favorite stations
+        if (mCallback != null) {
+            mCallback.onFavButtonClicked();
+        }
+        Toast.makeText(StateListActivity.this, getString(R.string.got_favorite_stations), Toast.LENGTH_SHORT).show();
     }
 
     private void initVariables() {
@@ -134,18 +142,6 @@ public class StateListActivity extends AppCompatActivity{
             mProgressDialog.dismiss();
         }
         mProgressBar.setVisibility(View.GONE);
-    }
-
-    private void setupFloatingButton() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Go to the station list view but only show all the favorite stations
-                onButtonClicked();
-                Toast.makeText(StateListActivity.this, getString(R.string.got_favorite_stations), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void setupToolbar() {

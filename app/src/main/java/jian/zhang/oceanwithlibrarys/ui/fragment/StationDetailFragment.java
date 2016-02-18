@@ -23,6 +23,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
@@ -34,19 +36,23 @@ import jian.zhang.oceanwithlibrarys.utils.Utils;
 
 public class StationDetailFragment extends Fragment {
 
+    @Bind(R.id.progress_bar)
+    ProgressBar mProgressBar;
+
+    @Bind(R.id.list_tide)
+    RecyclerView mTideRecyclerView;
+
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
+
     private static final String TAG = "OceanTide";
 
-    private ProgressBar mProgressBar;
-    private RecyclerView mTideRecyclerView;
-    private FloatingActionButton mFab;
     private Station mStation;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+
     public StationDetailFragment() {
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,8 +64,7 @@ public class StationDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.station_detail_fragment, container, false);
-
-        initViews(rootView);
+        ButterKnife.bind(this, rootView);
         setupStationNameTextView(rootView);
         setupFavCheckBoxFeature(rootView);
         startStationDetailTask();
@@ -68,12 +73,6 @@ public class StationDetailFragment extends Fragment {
 
     private void initVariables(){
         mStation = getArguments().getParcelable(IntentExtra.STATION_PARCELABLE);
-    }
-
-    private void initViews(View rootView){
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
-        mTideRecyclerView = (RecyclerView) rootView.findViewById(R.id.list_tide);
-        mFab = (FloatingActionButton) rootView.findViewById(R.id.fab);
     }
 
     private void startStationDetailTask(){

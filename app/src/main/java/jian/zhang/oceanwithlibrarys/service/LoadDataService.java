@@ -9,23 +9,62 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
+import javax.inject.Inject;
+
+import jian.zhang.oceanwithlibrarys.OceanAPI;
+import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
-import jian.zhang.oceanwithlibrarys.network.WebService;
+import retrofit2.Call;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by jian on 12/15/2015.
  */
 public class LoadDataService extends Service {
 
+    @Inject
+    OceanAPI mOceanAPI;
+
+
     private static final String TAG = "LoadDataService";
+    private List<Station> mStationList;
+
+    private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+
+
+    private void loadData() {
+        mCompositeSubscription.add(
+                mOceanAPI.getStations()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<List<Station>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<Station> stations) {
+                                mStationList = stations;
+                                new SetUpDatabaseTask().execute();
+                            }
+
+                        }));
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,30 +73,41 @@ public class LoadDataService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        new GetStationsTask().execute();
+        //final Call<List<Station>> call = networkAPI.getStations();  //without rxJava
+        //new GetStationsTask().execute(call);
+        ((OceanApplication) getApplication()).getOceanComponent().inject(this);
+        loadData();
         return START_NOT_STICKY;
     }
 
-    private class GetStationsTask extends AsyncTask<Void, Void, String> {
+    private class GetStationsTask extends AsyncTask<Call, Void, Boolean> {
 
         @Override
-        protected String doInBackground(Void... params) {
-            return WebService.getJson(Constants.OCEAN_CANDY_BASE_URL2);
+        protected Boolean doInBackground(Call... calls) {
+            try {
+                //mStationList = (List<Station>) calls[0].execute().body();
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+                return false;
+            }
         }
 
         @Override
-        protected void onPostExecute(String jsonData) {
-            super.onPostExecute(jsonData);
-            new SetUpDatabaseTask().execute(jsonData);
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (result) {
+                new SetUpDatabaseTask().execute();
+            }
         }
     }
 
-    private class SetUpDatabaseTask extends AsyncTask<String, Void, Boolean> {
+    private class SetUpDatabaseTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
-        protected Boolean doInBackground(String... jsonData) {
+        protected Boolean doInBackground(Void... params) {
             try {
-                setupStationDatabase(jsonData[0]);
+                setupStationDatabase();
                 return true;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
@@ -74,6 +124,7 @@ public class LoadDataService extends Service {
                 sendFinishBroadcast();
             }
             // stop the service after data loaded
+            mCompositeSubscription.unsubscribe();
             stopSelf();
         }
     }
@@ -90,18 +141,12 @@ public class LoadDataService extends Service {
         LocalBroadcastManager.getInstance(LoadDataService.this).sendBroadcast(loadIntent);
     }
 
-    private void setupStationDatabase(String jsonData)
-            throws JSONException {
+    private void setupStationDatabase(){
         // if the task is interrupted in the middle, the first time start is not set false yet,
         // so the database maybe set multiple times, so clean the database first
         StationManager.get(this).clearStations();
-        JSONArray jStationArr = new JSONArray(jsonData);
-        for (int i = 0; i < jStationArr.length(); i++) {
-            JSONObject jStation = jStationArr.getJSONObject(i);
-            Station station = new Station();
-            station.setName(jStation.getString("name"));
-            station.setStateName(jStation.getString("state_name"));
-            station.setStationId(jStation.getString("id"));
+        for (int i = 0; i < mStationList.size(); i++) {
+            Station station = mStationList.get(i);
             station.setFavorite(Constants.FAVORITE_FALSE);
             station.setId(StationManager.get(this).insertStation(station));
         }

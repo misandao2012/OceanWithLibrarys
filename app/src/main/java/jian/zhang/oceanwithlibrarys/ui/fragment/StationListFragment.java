@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
@@ -29,13 +31,13 @@ import jian.zhang.oceanwithlibrarys.ui.activity.StationDetailActivity;
  * Created by jian on 12/14/2015.
  */
 public class StationListFragment extends Fragment {
-    /**
-     * Whether or not the activity is in three-pane mode, i.e. running on a tablet
-     * device.
-     */
+
+
+    @Bind(R.id.station_list)
+    RecyclerView mRecyclerView;
+
     private boolean mMultiplePane;
     private String mStateName;
-    private RecyclerView mRecyclerView;
     private StationListLoaderCallbacks mStationListLoaderCallbacks;
 
     @Override
@@ -48,9 +50,8 @@ public class StationListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.station_list_fragment, container, false);
+        ButterKnife.bind(this, rootView);
         setupStateNameTextView(rootView);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.station_list);
-        assert mRecyclerView != null;
         initLoader();
         registerFavChangedReceiver();
         return rootView;
@@ -104,7 +105,7 @@ public class StationListFragment extends Fragment {
         StationAdapter adapter = new StationAdapter(stationList);
         // if there is no favorite stations yet
         if (stationList.size() == 0 && mStateName.equals(getString(R.string.favorite_stations))) {
-            Toast.makeText(getActivity(), getActivity().getString(R.string.no_favorite_message), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.no_favorite_message), Toast.LENGTH_SHORT).show();
         }
         mRecyclerView.setAdapter(adapter);
     }
