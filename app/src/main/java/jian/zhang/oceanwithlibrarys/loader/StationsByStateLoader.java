@@ -4,6 +4,9 @@ import android.content.Context;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
@@ -13,18 +16,22 @@ import jian.zhang.oceanwithlibrarys.manager.StationManager;
  */
 public class StationsByStateLoader extends DataLoader<List<Station>> {
 
+    @Inject
+    StationManager mStationManager;
+
     private String mStateName;
 
     public StationsByStateLoader(Context context, String stateName) {
         super(context);
+        OceanApplication.app().getOceanComponent().inject(this);
         mStateName = stateName;
     }
 
     @Override
     public List<Station> loadInBackground() {
         if (mStateName.equals(getContext().getString(R.string.favorite_stations))) {
-            return StationManager.get(getContext()).getStationsByFav();
+            return mStationManager.getStationsByFav();
         }
-        return StationManager.get(getContext()).getStationsByState(mStateName);
+        return mStationManager.getStationsByState(mStateName);
     }
 }

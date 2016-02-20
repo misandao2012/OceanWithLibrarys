@@ -34,6 +34,9 @@ public class LoadDataService extends Service {
     @Inject
     OceanAPI mOceanAPI;
 
+    @Inject
+    StationManager mStationManager;
+
 
     private static final String TAG = "LoadDataService";
     private List<Station> mStationList;
@@ -75,7 +78,7 @@ public class LoadDataService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //final Call<List<Station>> call = networkAPI.getStations();  //without rxJava
         //new GetStationsTask().execute(call);
-        ((OceanApplication) getApplication()).getOceanComponent().inject(this);
+        OceanApplication.app().getOceanComponent().inject(this);
         loadData();
         return START_NOT_STICKY;
     }
@@ -144,11 +147,11 @@ public class LoadDataService extends Service {
     private void setupStationDatabase(){
         // if the task is interrupted in the middle, the first time start is not set false yet,
         // so the database maybe set multiple times, so clean the database first
-        StationManager.get(this).clearStations();
+        mStationManager.clearStations();
         for (int i = 0; i < mStationList.size(); i++) {
             Station station = mStationList.get(i);
             station.setFavorite(Constants.FAVORITE_FALSE);
-            station.setId(StationManager.get(this).insertStation(station));
+            station.setId(mStationManager.insertStation(station));
         }
     }
 }

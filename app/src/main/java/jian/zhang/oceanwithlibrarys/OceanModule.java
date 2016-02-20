@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
+import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -21,6 +22,11 @@ public class OceanModule {
         this.context = context;
     }
 
+    @Singleton
+    @Provides
+    public StationManager provideStationManager(){
+        return new StationManager(context);
+    }
 
     @Singleton
     @Provides

@@ -19,8 +19,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
@@ -36,6 +39,9 @@ import jian.zhang.oceanwithlibrarys.utils.Utils;
  * Created by jian on 12/16/2015.
  */
 public class StateListFragment extends Fragment implements StateListActivity.Callback {
+
+    @Inject
+    StationManager mStationManager;
 
     @Bind(R.id.state_list)
     RecyclerView mStateRecyclerView;
@@ -65,6 +71,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        OceanApplication.app().getOceanComponent().inject(this);
         setRetainInstance(true);
     }
 
@@ -139,7 +146,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
 
         @Override
         protected List<Station> doInBackground(Void... params) {
-            return StationManager.get(getActivity()).getStationsGroupByState();
+            return mStationManager.getStationsGroupByState();
         }
 
         @Override

@@ -14,18 +14,10 @@ import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 /* Singleton Station Manager to wrap up database functions
 * */
 public class StationManager {
-    private static StationManager sStationManager;
 
     private StationDatabaseHelper mDatabaseHelper;
 
-    public static StationManager get(Context context) {
-        if (sStationManager == null) {
-            sStationManager = new StationManager(context);
-        }
-        return sStationManager;
-    }
-
-    private StationManager(Context context) {
+    public StationManager(Context context) {
         mDatabaseHelper = new StationDatabaseHelper(context);
     }
 

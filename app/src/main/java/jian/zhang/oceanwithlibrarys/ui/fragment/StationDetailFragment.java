@@ -23,8 +23,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
@@ -35,6 +38,9 @@ import jian.zhang.oceanwithlibrarys.network.WebService;
 import jian.zhang.oceanwithlibrarys.utils.Utils;
 
 public class StationDetailFragment extends Fragment {
+
+    @Inject
+    StationManager mStationManager;
 
     @Bind(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -57,6 +63,7 @@ public class StationDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        OceanApplication.app().getOceanComponent().inject(this);
         initVariables();
     }
 
@@ -179,7 +186,7 @@ public class StationDetailFragment extends Fragment {
     private void sendFavChangedBroadcast() {
         Intent intent = new Intent(IntentExtra.FAVORITE_CHANGED);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-        StationManager.get(getActivity()).updateCardByStation(mStation);
+        mStationManager.updateCardByStation(mStation);
     }
 
     private void setupShareFeature(final List<Tide> tides) {
