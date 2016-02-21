@@ -18,9 +18,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,6 +32,7 @@ import butterknife.OnClick;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
+import jian.zhang.oceanwithlibrarys.service.RegistrationIntentService;
 import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
 
 public class StateListActivity extends AppCompatActivity{
@@ -35,9 +40,12 @@ public class StateListActivity extends AppCompatActivity{
     @Bind(R.id.progress_bar)
     ProgressBar mProgressBar;
 
+    private static final String TAG = "StateListActivity";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private boolean mMultiplePane;
     private ProgressDialog mProgressDialog;
     private Callback mCallback;
+
 
     public ProgressBar getProgressBar(){
         return mProgressBar;
@@ -66,12 +74,33 @@ public class StateListActivity extends AppCompatActivity{
         registerDataLoadedReceiver();
         initViews();
         initActions();
+
+        if (checkPlayServices()) {
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(onDataLoaded);
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
     private void initActions(){
@@ -94,6 +123,21 @@ public class StateListActivity extends AppCompatActivity{
             // when the data loading is finished, it will receive this broadcast,
             // then dismiss the progress views
             dismissProgressDialogs();
+        }
+    };
+
+    private BroadcastReceiver mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(context);
+            boolean sentToken = sharedPreferences
+                    .getBoolean(Preference.SENT_TOKEN_TO_SERVER, false);
+            if (sentToken) {
+                Toast.makeText(StateListActivity.this, "Token retrieved and sent to server!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(StateListActivity.this, "Token Error", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -151,5 +195,18 @@ public class StateListActivity extends AppCompatActivity{
         if (actionBar != null) {
             actionBar.setTitle(getString(R.string.app_title));
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Preference.REGISTRATION_COMPLETE));
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
     }
 }

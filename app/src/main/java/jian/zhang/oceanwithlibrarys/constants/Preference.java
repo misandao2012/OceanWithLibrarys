@@ -5,4 +5,6 @@ package jian.zhang.oceanwithlibrarys.constants;
  */
 public class Preference {
     public static final String PREF_FIRST_TIME_START = "FIRST_TIME_START";
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String REGISTRATION_COMPLETE = "registrationComplete";
 }

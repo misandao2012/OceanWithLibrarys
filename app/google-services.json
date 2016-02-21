@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_id": "abstract-arbor-121818",
+    "project_number": "656861745509",
+    "name": "My Project"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656861745509:android:388d4abb3cfd68b4",
+        "client_id": "android:jian.zhang.oceanwithlibrarys",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "jian.zhang.oceanwithlibrarys"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
