@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import jian.zhang.oceanwithlibrarys.OceanApplication;
+import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;

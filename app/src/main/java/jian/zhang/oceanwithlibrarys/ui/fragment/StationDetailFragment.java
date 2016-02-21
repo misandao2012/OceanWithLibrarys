@@ -27,7 +27,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import jian.zhang.oceanwithlibrarys.OceanApplication;
+import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;

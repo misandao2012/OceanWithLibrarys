@@ -1,15 +1,12 @@
 package jian.zhang.oceanwithlibrarys.ui.fragment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,17 +14,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import jian.zhang.oceanwithlibrarys.network.WebService;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
@@ -81,7 +82,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         View rootView = inflater.inflate(R.layout.state_list_fragment, container, false);
         ButterKnife.bind(this, rootView);
         initRecyclerView();
-        registerDataLoadedReceiver();
+        EventBus.getDefault().register(this);
         initActions();
         return rootView;
     }
@@ -89,7 +90,14 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(onDataLoaded);
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFirstTimeLoaded(LoadDataService.FirstTimeLoadedEvent event){
+        // when the data loading is finished, it will receive this event,
+        // then dismiss the progress views and update the UI
+        loadData();
     }
 
     private void initActions(){
@@ -121,14 +129,6 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         Utils.unlockOrientation(getActivity());
     }
 
-    private BroadcastReceiver onDataLoaded = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // when the data loading is finished, it will receive this broadcast,
-            // then dismiss the progress views and update the UI
-            loadData();
-        }
-    };
 
     private void loadData() {
         new LoadDatabaseTask().execute();
@@ -174,10 +174,6 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         mStateRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void registerDataLoadedReceiver() {
-        IntentFilter filter = new IntentFilter(IntentExtra.FIRST_TIME_DATA_LOADED);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onDataLoaded, filter);
-    }
 
     private void onButtonClicked(String name) {
         if (mContext!=null && mContext instanceof StateListActivity) {

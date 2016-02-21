@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys;
+package jian.zhang.oceanwithlibrarys.global;
 
 import javax.inject.Singleton;
 

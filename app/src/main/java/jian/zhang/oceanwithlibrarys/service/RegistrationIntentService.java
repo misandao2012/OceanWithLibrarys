@@ -5,12 +5,13 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 
@@ -44,9 +45,11 @@ public class RegistrationIntentService extends IntentService {
 
             sharedPreferences.edit().putBoolean(Preference.SENT_TOKEN_TO_SERVER, false).apply();
         }
+        EventBus.getDefault().post(new RegistrationCompleteEvent());
+    }
 
-        Intent registrationComplete = new Intent(Preference.REGISTRATION_COMPLETE);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+    public class RegistrationCompleteEvent{
+
     }
 
     private void sendRegistrationToServer(String token) {

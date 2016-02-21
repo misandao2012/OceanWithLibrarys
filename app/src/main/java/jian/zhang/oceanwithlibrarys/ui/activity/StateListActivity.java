@@ -5,16 +5,12 @@ package jian.zhang.oceanwithlibrarys.ui.activity;
  */
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,12 +22,16 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jian.zhang.oceanwithlibrarys.R;
-import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
+import jian.zhang.oceanwithlibrarys.service.LoadDataService;
 import jian.zhang.oceanwithlibrarys.service.RegistrationIntentService;
 import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
 
@@ -71,7 +71,6 @@ public class StateListActivity extends AppCompatActivity{
         ButterKnife.bind(this);
 
         initVariables();
-        registerDataLoadedReceiver();
         initViews();
         initActions();
 
@@ -81,11 +80,27 @@ public class StateListActivity extends AppCompatActivity{
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onDataLoaded);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFirstTimeLoaded(LoadDataService.FirstTimeLoadedEvent event){
+        // when the data loading is finished, it will receive this event,
+        // then dismiss the progress views
+        dismissProgressDialogs();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRegisterComplete(RegistrationIntentService.RegistrationCompleteEvent event){
+
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean sentToken = sharedPreferences
+                .getBoolean(Preference.SENT_TOKEN_TO_SERVER, false);
+        if (sentToken) {
+            Toast.makeText(StateListActivity.this, "Token retrieved and sent to server!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(StateListActivity.this, "Token Error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -111,35 +126,6 @@ public class StateListActivity extends AppCompatActivity{
             mProgressBar.setVisibility(View.GONE);
         }
     }
-
-    private void registerDataLoadedReceiver() {
-        IntentFilter filter = new IntentFilter(IntentExtra.FIRST_TIME_DATA_LOADED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(onDataLoaded, filter);
-    }
-
-    private BroadcastReceiver onDataLoaded = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // when the data loading is finished, it will receive this broadcast,
-            // then dismiss the progress views
-            dismissProgressDialogs();
-        }
-    };
-
-    private BroadcastReceiver mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(context);
-            boolean sentToken = sharedPreferences
-                    .getBoolean(Preference.SENT_TOKEN_TO_SERVER, false);
-            if (sentToken) {
-                Toast.makeText(StateListActivity.this, "Token retrieved and sent to server!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(StateListActivity.this, "Token Error", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
 
 
     private void startStateListFragment() {
@@ -200,13 +186,12 @@ public class StateListActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Preference.REGISTRATION_COMPLETE));
+        EventBus.getDefault().register(this);
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-        super.onPause();
+        EventBus.getDefault().unregister(this);
+        super.onPause();  // notice here super put in the end
     }
 }

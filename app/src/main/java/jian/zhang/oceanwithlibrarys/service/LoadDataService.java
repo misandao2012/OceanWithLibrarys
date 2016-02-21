@@ -6,19 +6,19 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import jian.zhang.oceanwithlibrarys.OceanAPI;
-import jian.zhang.oceanwithlibrarys.OceanApplication;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
-import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.global.OceanAPI;
+import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import retrofit2.Call;
 import rx.Observer;
@@ -123,8 +123,8 @@ public class LoadDataService extends Service {
             super.onPostExecute(result);
             if (result) {
                 setFirstTimeStartFalse();
-                // The loading is finish, then send the broadcast to the activity
-                sendFinishBroadcast();
+                // The loading is finish, then send the event to the activity
+                EventBus.getDefault().post(new FirstTimeLoadedEvent());
             }
             // stop the service after data loaded
             mCompositeSubscription.unsubscribe();
@@ -139,9 +139,9 @@ public class LoadDataService extends Service {
         editor.apply();
     }
 
-    private void sendFinishBroadcast() {
-        Intent loadIntent = new Intent(IntentExtra.FIRST_TIME_DATA_LOADED);
-        LocalBroadcastManager.getInstance(LoadDataService.this).sendBroadcast(loadIntent);
+
+    public class FirstTimeLoadedEvent{
+
     }
 
     private void setupStationDatabase(){
