@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.ui.activity;
+package jian.zhang.oceanwithlibrarys.stationDetail;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
-import jian.zhang.oceanwithlibrarys.ui.fragment.StationDetailFragment;
+import jian.zhang.oceanwithlibrarys.ui.activity.StationListActivity;
 
 /**
  * An activity representing a single Item detail screen. This

@@ -25,7 +25,8 @@ import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
-import jian.zhang.oceanwithlibrarys.ui.activity.StationDetailActivity;
+import jian.zhang.oceanwithlibrarys.stationDetail.StationDetailActivity;
+import jian.zhang.oceanwithlibrarys.stationDetail.StationDetailFragment;
 
 /**
  * Created by jian on 12/14/2015.

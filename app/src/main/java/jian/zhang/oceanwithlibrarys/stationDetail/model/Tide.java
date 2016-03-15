@@ -1,10 +1,19 @@
-package jian.zhang.oceanwithlibrarys.domainobjects;
+package jian.zhang.oceanwithlibrarys.stationDetail.model;
 
 public class Tide {
+	private String mId;
 	private String mTime;
 	private String mFeet;
 	private String mLowOrHigh;
-	
+
+	public String getId() {
+		return mId;
+	}
+
+	public void setId(String id) {
+		this.mId = id;
+	}
+
 	public String getTime() {
 		return mTime;
 	}

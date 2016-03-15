@@ -1,0 +1,173 @@
+package jian.zhang.oceanwithlibrarys.stationDetail;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import jian.zhang.oceanwithlibrarys.R;
+import jian.zhang.oceanwithlibrarys.constants.Constants;
+import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
+import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.global.OceanApplication;
+import jian.zhang.oceanwithlibrarys.manager.StationManager;
+import jian.zhang.oceanwithlibrarys.stationDetail.model.Tide;
+import jian.zhang.oceanwithlibrarys.stationDetail.presenter.StationDetailPresenter;
+import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailView;
+
+public class StationDetailFragment extends Fragment implements StationDetailView{
+
+    @Inject
+    StationManager mStationManager;
+
+    @Bind(R.id.progress_bar)
+    ProgressBar mProgressBar;
+
+    @Bind(R.id.list_tide)
+    RecyclerView mTideRecyclerView;
+
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
+
+    private static final String TAG = "OceanTide";
+
+    private Station mStation;
+    private TideAdapter mAdapter;
+    private StationDetailPresenter mPresenter;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OceanApplication.app().getOceanComponent().inject(this);
+        initVariables();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.station_detail_fragment, container, false);
+        ButterKnife.bind(this, rootView);
+        setupStationNameTextView(rootView);
+        setupFavCheckBoxFeature(rootView);
+        //startStationDetailTask();
+
+        mTideRecyclerView.setHasFixedSize(true);
+        mTideRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mAdapter = new TideAdapter(getActivity());
+        mTideRecyclerView.setAdapter(mAdapter);
+        return rootView;
+    }
+
+    private void initVariables(){
+        mStation = getArguments().getParcelable(IntentExtra.STATION_PARCELABLE);
+        mPresenter = new StationDetailPresenter(mStation, getActivity());
+    }
+
+    private void setupStationNameTextView(View rootView) {
+        TextView stationNameTextView = (TextView) rootView.findViewById(R.id.tv_station_name);
+        // If it is multiple panes, do not show the station subtitle
+        if (getArguments().getBoolean(IntentExtra.SHOW_STATION_SUBTITLE)) {
+            stationNameTextView.setVisibility(View.VISIBLE);
+            stationNameTextView.setText(mStation.getName());
+        } else {
+            stationNameTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.bindView(this);
+    }
+
+    @Override
+    public void onPause() {
+        mPresenter.unbindView();
+        super.onPause();
+    }
+
+    @Override
+    public void showTideList(List<Tide> tideList) {
+        mAdapter.clearAndAddAll(tideList);
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showLoading() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    // If the favorite check box is checked, the favorite feature will be updated to the database
+    private void setupFavCheckBoxFeature(View rootView) {
+        CheckBox favoriteCheck = (CheckBox) rootView.findViewById(R.id.favorite_check);
+        initFavCheckBox(favoriteCheck);
+        favoriteCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onFavCheckClicked(view);
+            }
+        });
+    }
+
+    private void initFavCheckBox(CheckBox favoriteCheck) {
+        String ifFavorite = mStation.getFavorite();
+        if (ifFavorite != null && ifFavorite.equals(Constants.FAVORITE_TRUE)) {
+            favoriteCheck.setChecked(true);
+        } else {
+            favoriteCheck.setChecked(false);
+        }
+    }
+
+    private void onFavCheckClicked(View view) {
+        if (((CheckBox) view).isChecked()) {
+            mStation.setFavorite(Constants.FAVORITE_TRUE);
+        } else {
+            mStation.setFavorite(Constants.FAVORITE_FALSE);
+        }
+        // The favorite status changed, then send the broadcast
+        sendFavChangedBroadcast();
+    }
+
+    private void sendFavChangedBroadcast() {
+        Intent intent = new Intent(IntentExtra.FAVORITE_CHANGED);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+        mStationManager.updateCardByStation(mStation);
+    }
+
+    @Override
+    public void setupShareFeature(final List<Tide> tides) {
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareStationTideInformation(tides, mStation);
+            }
+        });
+    }
+
+    /*
+    * Share the tide information to other apps
+    * */
+    public void shareStationTideInformation(List<Tide> tides, Station station) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "I got " + tides.size() + " Tide Information from " + station.getName());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_tide_infomation)));
+    }
+
+}

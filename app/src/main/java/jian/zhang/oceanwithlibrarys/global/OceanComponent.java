@@ -6,7 +6,7 @@ import dagger.Component;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
 import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
-import jian.zhang.oceanwithlibrarys.ui.fragment.StationDetailFragment;
+import jian.zhang.oceanwithlibrarys.stationDetail.StationDetailFragment;
 
 @Singleton
 @Component(modules = {OceanModule.class})

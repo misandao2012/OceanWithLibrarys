@@ -7,7 +7,7 @@
     android:padding="16dp"
     android:id="@+id/root_view"
     android:textIsSelectable="true"
-    tools:context=".ui.fragment.StationDetailFragment">
+    tools:context=".stationDetail.StationDetailFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
