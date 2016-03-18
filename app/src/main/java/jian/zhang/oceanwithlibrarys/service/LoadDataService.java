@@ -97,9 +97,9 @@ public class LoadDataService extends Service {
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-            if (result) {
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            if (success) {
                 new SetUpDatabaseTask().execute();
             }
         }

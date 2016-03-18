@@ -5,8 +5,9 @@ import javax.inject.Singleton;
 import dagger.Component;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
+import jian.zhang.oceanwithlibrarys.stationDetail.presenter.StationDetailPresenter;
 import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
-import jian.zhang.oceanwithlibrarys.stationDetail.StationDetailFragment;
+import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailFragment;
 
 @Singleton
 @Component(modules = {OceanModule.class})
@@ -16,4 +17,5 @@ public interface OceanComponent {
     void inject(StationsByStateLoader loader);
     void inject(StateListFragment fragment);
     void inject(StationDetailFragment fragment);
+    void inject(StationDetailPresenter presenter);
 }

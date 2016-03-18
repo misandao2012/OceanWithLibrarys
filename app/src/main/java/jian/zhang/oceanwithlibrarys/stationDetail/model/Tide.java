@@ -2,39 +2,48 @@ package jian.zhang.oceanwithlibrarys.stationDetail.model;
 
 public class Tide {
 	private String mId;
-	private String mTime;
-	private String mFeet;
-	private String mLowOrHigh;
+	private String time;
+	private String feet;
+	private String tide;
+	//private String mLowOrHigh;
+
+	public String getTide() {
+		return tide;
+	}
+
+	public void setTide(String tide) {
+		this.tide = tide;
+	}
 
 	public String getId() {
 		return mId;
 	}
 
 	public void setId(String id) {
-		this.mId = id;
+		mId = id;
 	}
 
 	public String getTime() {
-		return mTime;
+		return time;
 	}
 
 	public void setTime(String time) {
-		mTime = time;
+		this.time = time;
 	}
 
 	public String getFeet() {
-		return mFeet;
+		return feet;
 	}
 
 	public void setFeet(String feet) {
-		mFeet = feet;
+		this.feet = feet;
 	}
 
-	public String getLowOrHigh() {
+	/*public String getLowOrHigh() {
 		return mLowOrHigh;
 	}
 
 	public void setLowOrHigh(String lowOrHigh) {
-		this.mLowOrHigh = lowOrHigh;
-	}
+		mLowOrHigh = lowOrHigh;
+	}*/
 }

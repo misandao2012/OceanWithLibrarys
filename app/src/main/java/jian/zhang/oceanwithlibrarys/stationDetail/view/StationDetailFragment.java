@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.stationDetail;
+package jian.zhang.oceanwithlibrarys.stationDetail.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,9 +26,9 @@ import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
+import jian.zhang.oceanwithlibrarys.stationDetail.TideAdapter;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.Tide;
 import jian.zhang.oceanwithlibrarys.stationDetail.presenter.StationDetailPresenter;
-import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailView;
 
 public class StationDetailFragment extends Fragment implements StationDetailView{
 
@@ -64,7 +64,6 @@ public class StationDetailFragment extends Fragment implements StationDetailView
         ButterKnife.bind(this, rootView);
         setupStationNameTextView(rootView);
         setupFavCheckBoxFeature(rootView);
-        //startStationDetailTask();
 
         mTideRecyclerView.setHasFixedSize(true);
         mTideRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -92,7 +91,7 @@ public class StationDetailFragment extends Fragment implements StationDetailView
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.bindView(this);
+        mPresenter.bindView(this);   //注意这里的this是Fragment,还可以是什么类型?
     }
 
     @Override

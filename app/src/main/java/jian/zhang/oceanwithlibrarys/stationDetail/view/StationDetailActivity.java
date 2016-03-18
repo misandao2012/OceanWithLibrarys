@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.stationDetail;
+package jian.zhang.oceanwithlibrarys.stationDetail.view;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;

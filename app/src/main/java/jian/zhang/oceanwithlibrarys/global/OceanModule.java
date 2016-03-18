@@ -37,7 +37,7 @@ public class OceanModule {
                 .cache(cache)
                 .build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.OCEAN_CANDY_BASE_URL2)
+                .baseUrl(Constants.OCEAN_CANDY_BASE_URL)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

@@ -21,7 +21,7 @@ public class TidePresenter extends BasePresenter<Tide, TideView> {
     protected void updateView() {
         view().setTime(Utils.parseTideTime(mModel.getTime()));
         view().setFeet(mModel.getFeet());
-        view().setLowOrHigh(mContext.getString(R.string.low_or_high, mModel.getLowOrHigh()));
+        view().setLowOrHigh(mContext.getString(R.string.low_or_high, mModel.getTide()));
     }
 
 }
