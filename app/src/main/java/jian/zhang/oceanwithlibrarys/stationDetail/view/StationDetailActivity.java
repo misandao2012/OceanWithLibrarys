@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.ui.activity.StationListActivity;
 
 /**

@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import jian.zhang.oceanwithlibrarys.stationDetail.TideAdapter;
@@ -145,7 +145,7 @@ public class StationDetailFragment extends Fragment implements StationDetailView
     private void sendFavChangedBroadcast() {
         Intent intent = new Intent(IntentExtra.FAVORITE_CHANGED);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-        mStationManager.updateCardByStation(mStation);
+        mStationManager.updateFavByStation(mStation);
     }
 
     @Override

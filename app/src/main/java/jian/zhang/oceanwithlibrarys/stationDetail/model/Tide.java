@@ -1,9 +1,16 @@
 package jian.zhang.oceanwithlibrarys.stationDetail.model;
 
+import com.google.gson.annotations.Expose;
+
 public class Tide {
 	private String mId;
+	@Expose
 	private String time;
+
+	@Expose
 	private String feet;
+
+	@Expose
 	private String tide;
 	//private String mLowOrHigh;
 

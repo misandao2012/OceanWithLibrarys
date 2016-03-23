@@ -16,7 +16,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import jian.zhang.oceanwithlibrarys.base.BasePresenter;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanAPI;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.network.WebService;

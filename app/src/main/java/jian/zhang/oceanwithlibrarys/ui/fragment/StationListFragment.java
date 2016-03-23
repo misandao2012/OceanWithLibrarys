@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
 import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailActivity;
 import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailFragment;

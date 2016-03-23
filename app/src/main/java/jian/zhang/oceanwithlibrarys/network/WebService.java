@@ -5,43 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 
 import jian.zhang.oceanwithlibrarys.R;
 
 public class WebService {
 
-    private static final String TAG = "OceanTide Network";
-
-
-    // Get the Json data back from url
-    public static String getJson(String theUrl) {
-
-        StringBuilder content = new StringBuilder();
-        try {
-            URL url = new URL(theUrl);
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setConnectTimeout(30000);
-            urlConnection.setReadTimeout(30000);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection
-                    .getInputStream()));
-            String line;
-            while ((line = bufferedReader.readLine()) != null)
-            {
-                content.append(line);
-            }
-            bufferedReader.close();
-        }
-        catch(Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-        return content.toString();
-    }
+    private static final String TAG = WebService.class.getSimpleName();
 
     // Check if there is network available
     public static Boolean networkConnected(Context context){

@@ -2,10 +2,14 @@ package jian.zhang.oceanwithlibrarys.manager;
 
 import android.content.Context;
 
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import com.activeandroid.query.Update;
+
 import java.util.List;
 
-import jian.zhang.oceanwithlibrarys.database.StationDatabaseHelper;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.constants.Constants;
+import jian.zhang.oceanwithlibrarys.database.Station;
 
 /**
  * Created by jian on 12/14/2015.
@@ -15,33 +19,40 @@ import jian.zhang.oceanwithlibrarys.domainobjects.Station;
 * */
 public class StationManager {
 
-    private StationDatabaseHelper mDatabaseHelper;
-
     public StationManager(Context context) {
-        mDatabaseHelper = new StationDatabaseHelper(context);
+
     }
 
     public List<Station> getStationsGroupByState() {
-        return mDatabaseHelper.getStationsFromCursor(mDatabaseHelper.queryStationsGroupByState());
+        return new Select()
+                .from(Station.class)
+                .groupBy("stateName")
+                .execute();
     }
 
-    public List<Station> getStationsByState(String stateName) {
-        return mDatabaseHelper.getStationsFromCursor(mDatabaseHelper.queryStationsByState(stateName));
+    public List<Station> getStationsByState(final String stateName) {
+        return new Select()
+                .from(Station.class)
+                .where("stateName = ?", stateName)
+                .execute();
     }
 
     public List<Station> getStationsByFav() {
-        return mDatabaseHelper.getStationsFromCursor(mDatabaseHelper.queryStationsByFav());
+        return new Select()
+                .from(Station.class)
+                .where("favorite = ?", Constants.FAVORITE_TRUE)
+                .execute();
     }
 
     public void clearStations(){
-        mDatabaseHelper.deleteAllData();
+        new Delete().from(Station.class).executeSingle();
     }
 
-    public long insertStation(Station station){
-        return mDatabaseHelper.insertStation(station);
-    }
+    public void updateFavByStation(Station station){
+        new Update(Station.class)
+                .set("favorite = ?", station.getFavorite())
+                .where("stationId = ?", station.getStationId())   // 如果搜索Id会怎样呢?
+                .execute();
 
-    public boolean updateCardByStation(Station station){
-        return mDatabaseHelper.updateCardByStation(station);
     }
 }

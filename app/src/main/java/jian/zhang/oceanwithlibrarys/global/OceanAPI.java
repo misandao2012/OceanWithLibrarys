@@ -3,7 +3,7 @@ package jian.zhang.oceanwithlibrarys.global;
 
 import java.util.List;
 
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.TideType;
 import retrofit2.Call;
 import retrofit2.http.GET;

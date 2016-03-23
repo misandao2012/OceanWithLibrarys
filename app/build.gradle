@@ -47,4 +47,5 @@ dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
 
     compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
 }

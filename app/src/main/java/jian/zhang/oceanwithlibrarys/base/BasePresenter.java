@@ -34,7 +34,7 @@ public abstract class BasePresenter<M, V> {
         if(mView == null) {
             return null;
         } else {
-            return mView.get();
+            return mView.get();  // notice this get
         }
     }
 

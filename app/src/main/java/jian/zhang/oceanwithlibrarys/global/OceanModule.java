@@ -2,6 +2,8 @@ package jian.zhang.oceanwithlibrarys.global;
 
 import android.content.Context;
 
+import com.google.gson.GsonBuilder;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -39,7 +41,9 @@ public class OceanModule {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.OCEAN_CANDY_BASE_URL)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                        .excludeFieldsWithoutExposeAnnotation()  // 加上这个,否则active android Station不好用
+                        .create()))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         return retrofit.create(OceanAPI.class);

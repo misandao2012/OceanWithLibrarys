@@ -1,18 +1,39 @@
-package jian.zhang.oceanwithlibrarys.domainobjects;
+package jian.zhang.oceanwithlibrarys.database;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Station implements Parcelable {
-    private long mId;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.google.gson.annotations.Expose;
+
+
+@Table(name = "Stations")
+public class Station extends Model implements Parcelable {
+    @Expose
+    @Column(name = "stateName")
     private String state_name;
+
+    @Expose
+    @Column(name = "stationId")
     private String id;
+
+    @Expose
+    @Column(name = "stationName")
     private String name;
+
+    @Expose
+    @Column(name = "favorite")
     private String mFavorite;
 
-    public Station(){}
+
+    public Station() {
+        super();
+    }
 
     public Station(Parcel in) {
+        super();
         readFromParcel(in);
     }
 
@@ -22,14 +43,6 @@ public class Station implements Parcelable {
 
     public void setStateName(String stateName) {
         state_name = stateName;
-    }
-
-    public long getId() {
-        return mId;
-    }
-
-    public void setId(long id) {
-        mId = id;
     }
 
     public String getName() {
@@ -63,7 +76,6 @@ public class Station implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mId);
         dest.writeString(state_name);
         dest.writeString(id);
         dest.writeString(name);
@@ -71,7 +83,6 @@ public class Station implements Parcelable {
     }
 
     private void readFromParcel(Parcel in) {
-        mId = in.readLong();
         state_name = in.readString();
         id = in.readString();
         name = in.readString();
@@ -92,3 +103,5 @@ public class Station implements Parcelable {
             };
 
 }
+
+

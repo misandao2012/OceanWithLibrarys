@@ -2,6 +2,8 @@ package jian.zhang.oceanwithlibrarys.global;
 
 import android.app.Application;
 
+import com.activeandroid.ActiveAndroid;
+
 
 public class OceanApplication extends Application {
 
@@ -15,6 +17,7 @@ public class OceanApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ActiveAndroid.initialize(this);
         OceanApplication.mOceanApplication = this;
 
         mOceanComponent = DaggerOceanComponent.builder()  // just run the app if not recognized

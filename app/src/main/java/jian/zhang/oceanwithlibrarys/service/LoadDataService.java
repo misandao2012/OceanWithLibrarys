@@ -8,6 +8,8 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.activeandroid.ActiveAndroid;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import javax.inject.Inject;
 
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
-import jian.zhang.oceanwithlibrarys.domainobjects.Station;
+import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanAPI;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
@@ -38,7 +40,7 @@ public class LoadDataService extends Service {
     StationManager mStationManager;
 
 
-    private static final String TAG = "LoadDataService";
+    private static final String TAG = LoadDataService.class.getSimpleName();
     private List<Station> mStationList;
 
     private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
@@ -148,10 +150,17 @@ public class LoadDataService extends Service {
         // if the task is interrupted in the middle, the first time start is not set false yet,
         // so the database maybe set multiple times, so clean the database first
         mStationManager.clearStations();
-        for (int i = 0; i < mStationList.size(); i++) {
-            Station station = mStationList.get(i);
-            station.setFavorite(Constants.FAVORITE_FALSE);
-            station.setId(mStationManager.insertStation(station));
+        ActiveAndroid.beginTransaction();
+        try {
+            for (int i = 0; i < mStationList.size(); i++) {
+                Station station = mStationList.get(i);
+                station.setFavorite(Constants.FAVORITE_FALSE);
+                station.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }
+        finally {
+            ActiveAndroid.endTransaction();
         }
     }
 }
