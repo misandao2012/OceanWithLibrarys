@@ -45,7 +45,7 @@ public class StationManager {
     }
 
     public void clearStations(){
-        new Delete().from(Station.class).executeSingle();
+        new Delete().from(Station.class).execute();
     }
 
     public void updateFavByStation(Station station){
@@ -53,6 +53,5 @@ public class StationManager {
                 .set("favorite = ?", station.getFavorite())
                 .where("stationId = ?", station.getStationId())   // 如果搜索Id会怎样呢?
                 .execute();
-
     }
 }
