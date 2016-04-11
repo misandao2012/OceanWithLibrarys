@@ -35,7 +35,7 @@ import jian.zhang.oceanwithlibrarys.service.LoadDataService;
 import jian.zhang.oceanwithlibrarys.service.RegistrationIntentService;
 import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
 
-public class StateListActivity extends AppCompatActivity{
+public class StateListActivity extends AppCompatActivity {
 
     @Bind(R.id.progress_bar)
     ProgressBar mProgressBar;

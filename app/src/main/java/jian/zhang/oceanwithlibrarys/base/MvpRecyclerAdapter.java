@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 // 因为本class是abstract, 所以很多的abstract method不用实现
-public abstract class MvpRecyclerAdapter<M, P extends  BasePresenter, VH extends MvpViewHolder>
+public abstract class MvpRecyclerAdapter<M, P extends  BasePresenter, VH extends MvpViewHolder> // 这里的MvpViewHolder后面没接<P>
         extends RecyclerView.Adapter<VH> {
 
     protected final Map<Object, P> mPresenters;  // final, 但是可以往里面加东西
@@ -21,7 +21,7 @@ public abstract class MvpRecyclerAdapter<M, P extends  BasePresenter, VH extends
     @NonNull
     protected P getPresenter(@NonNull M model) {
         System.err.println("Getting presenter for item " + getModelId(model));
-        return mPresenters.get(getModelId(model));
+        return mPresenters.get(getModelId(model));   // 根据model的id得到对应的presenter
     }
 
     @NonNull

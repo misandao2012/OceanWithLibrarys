@@ -2,13 +2,7 @@ package jian.zhang.oceanwithlibrarys.stationDetail.presenter;
 
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +18,12 @@ import jian.zhang.oceanwithlibrarys.stationDetail.model.Tide;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.TideType;
 import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailView;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.subscriptions.CompositeSubscription;
 
+
+// presenter的作用就是代表之前的activity, fragment, viewholder, 让它们只展示view, 排除和model的关系
 public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDetailView> {
 
     @Inject
@@ -33,39 +31,9 @@ public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDet
 
     private static final String TAG = "OceanTide";
     private boolean isLoadingData = false;
-    private Station mStation;
-    private Context mContext;
-
+    private final Station mStation;
+    private final Context mContext;
     private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-
-    private void loadData2() {
-        /*isLoadingData = true;
-        mCompositeSubscription.add(
-                mOceanAPI.getTides(mStation.getStationId())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<List<Tide>>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                String a = e.getMessage();
-                                System.out.print(a);
-                            }
-
-                            @Override
-                            public void onNext(List<Tide> tides) {
-                                List<Tide> tideList = tides;
-                                setModel(tideList);
-                                view().setupShareFeature(tideList);
-                                isLoadingData = false;
-                            }
-
-                        }));*/
-    }
 
     public StationDetailPresenter(Station station, Context context) {
         mStation = station;
@@ -76,6 +44,7 @@ public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDet
     @Override
     protected void updateView() {
         view().showTideList(mModel);
+        view().setupShareFeature(mModel);
     }
 
     @Override
@@ -96,77 +65,44 @@ public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDet
     private void loadData() {
         isLoadingData = true;
         if (WebService.networkConnected(mContext)) {
-            final Call<TideType> call = mOceanAPI.getTides(mStation.getStationId());  //without rxJava
-            new GetStationDetailTask().execute(call);
-            //new GetStationDetailTask().execute();
+            getStationDetail();
         } else {
             WebService.showNetworkDialog(mContext);
         }
-
     }
 
-    // Call the api with station Id to get the station detail information
-    private class GetStationDetailTask extends AsyncTask<Call, Void, Boolean> {
-
-        TideType mTideType;
-
-        // {"Low":[{"time":"2016-03-18 05:48:00 -0400","feet":"-0.1","tide":"Low"}],"High":[{"time":"2016-03-18 19:59:00 -0400","feet":"0.7","tide":"High"}]}
-        @Override
-        protected Boolean doInBackground(Call... calls) {   // 8730067
-            try {
-                mTideType = (TideType) calls[0].execute().body();
-                return true;
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
-                return false;
+    // Call the api with station Id to get the station detail information, 例如 8730067
+    // {"Low":[{"time":"2016-03-18 05:48:00 -0400","feet":"-0.1","tide":"Low"}],"High":[{"time":"2016-03-18 19:59:00 -0400","feet":"0.7","tide":"High"}]}
+    private void getStationDetail() {
+        final Call<TideType> call = mOceanAPI.getTides(mStation.getStationId());
+        call.enqueue(new Callback<TideType>() {
+            @Override
+            public void onResponse(Call<TideType> call, Response<TideType> response) {
+                int statusCode = response.code();
+                TideType tideType = response.body();
+                handleTideResults(tideType);
             }
-            //return WebService.getJson(Constants.OCEAN_CANDY_BASE_URL + "/stations/" + mStation.getStationId());
-        }
 
-        @Override
-        protected void onPostExecute(final Boolean jsonData) {
-            super.onPostExecute(jsonData);
-            //List<Tide> tideList = setupTideList(jsonData);
-            List<Tide> tideList = new ArrayList<>();
-            tideList.addAll(mTideType.getHigh());
-            tideList.addAll(mTideType.getLow());
-            for (int i = 0; i < tideList.size(); i++) {
-                tideList.get(i).setId(i + "");
-
+            @Override
+            public void onFailure(Call<TideType> call, Throwable t) {
+                // Log error here since request failed
             }
-            setModel(tideList);
-            view().setupShareFeature(tideList);
-            isLoadingData = false;
-        }
+        });
     }
 
-    private List<Tide> setupTideList(final String jsonData) {
-        List<Tide> tideList = new ArrayList<>();
-        try {
-            tideList.addAll(getTideList(jsonData, "Low"));
-            tideList.addAll(getTideList(jsonData, "High"));
-        } catch (JSONException e) {
-            Log.e(TAG, e.getMessage());
+    private void handleTideResults(final TideType tideType) {
+        final List<Tide> tideList = new ArrayList<>();
+        if (tideType.getHigh() != null) {
+            tideList.addAll(tideType.getHigh());
         }
-        return tideList;
-    }
-
-    // get the tide info list for the low or high
-    private List<Tide> getTideList(String jsonData, String lowOrHigh) throws JSONException {
-        List<Tide> tideList = new ArrayList<>();
-        JSONObject jTideObj = new JSONObject(jsonData);
-        JSONArray jTideArr = jTideObj.getJSONArray(lowOrHigh);
-
-        for (int i = 0; i < jTideArr.length(); i++) {
-            JSONObject jTide = jTideArr.getJSONObject(i);
-            Tide tide = new Tide();
-            tide.setId(i + "");
-            tide.setTime(jTide.getString("time"));
-            tide.setFeet(jTide.getString("feet"));
-            //tide.setLowOrHigh(lowOrHigh);
-            tideList.add(tide);
+        if (tideType.getLow() != null) {
+            tideList.addAll(tideType.getLow());
         }
-        return tideList;
-    }
+        for (int i = 0; i < tideList.size(); i++) {
+            tideList.get(i).setId(i + "");
 
+        }
+        setModel(tideList);   // setModel时会更新view
+        isLoadingData = false;
+    }
 }

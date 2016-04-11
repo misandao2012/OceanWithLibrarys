@@ -25,14 +25,15 @@ public class TideAdapter extends MvpRecyclerListAdapter<Tide, TidePresenter, Tid
     @Override
     public TideViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // notice this parent.getContext()
-        return new TideViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.station_detail_item, parent, false));
+        return new TideViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.station_detail_item, parent, false));
     }
 
     @NonNull
     @Override
     protected TidePresenter createPresenter(@NonNull Tide tide) {
         TidePresenter presenter = new TidePresenter(mContext);
-        presenter.setModel(tide);
+        presenter.setModel(tide);   // 这里就updateView了
         return presenter;
     }
 

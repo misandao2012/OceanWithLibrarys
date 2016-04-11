@@ -8,6 +8,8 @@ import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.base.MvpViewHolder;
 import jian.zhang.oceanwithlibrarys.stationDetail.presenter.TidePresenter;
 
+
+// 之后ItemView里面有很多动作的时候,这种mvp才更有意义,因为ViewHolder会引入presenter来实现各种动作,而这里面没有
 public class TideViewHolder extends MvpViewHolder<TidePresenter> implements TideView {
 
     private final TextView mTimeTextView;   // notice the final here

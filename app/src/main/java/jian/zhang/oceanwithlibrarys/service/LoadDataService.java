@@ -23,6 +23,7 @@ import jian.zhang.oceanwithlibrarys.global.OceanAPI;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import retrofit2.Call;
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -48,7 +49,7 @@ public class LoadDataService extends Service {
 
     private void loadData() {
         mCompositeSubscription.add(
-                mOceanAPI.getStations()
+                mOceanAPI.getStations()  // Observable<List<Station>>
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<List<Station>>() {
@@ -59,7 +60,10 @@ public class LoadDataService extends Service {
 
                             @Override
                             public void onError(Throwable e) {
-
+                                if (e instanceof HttpException) {
+                                    HttpException response = (HttpException) e;
+                                    int code = response.code();
+                                }
                             }
 
                             @Override
@@ -78,9 +82,9 @@ public class LoadDataService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //final Call<List<Station>> call = networkAPI.getStations();  //without rxJava
-        //new GetStationsTask().execute(call);
         OceanApplication.app().getOceanComponent().inject(this);
+        //final Call<List<Station>> call = mOceanAPI.getStations();  //without rxJava, OceanAPI里面要把Observable改成Call
+        //new GetStationsTask().execute(call);
         loadData();
         return START_NOT_STICKY;
     }
@@ -90,7 +94,7 @@ public class LoadDataService extends Service {
         @Override
         protected Boolean doInBackground(Call... calls) {
             try {
-                //mStationList = (List<Station>) calls[0].execute().body();
+                mStationList = (List<Station>) calls[0].execute().body();
                 return true;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
@@ -142,11 +146,11 @@ public class LoadDataService extends Service {
     }
 
 
-    public class FirstTimeLoadedEvent{
+    public class FirstTimeLoadedEvent {
 
     }
 
-    private void setupStationDatabase(){
+    private void setupStationDatabase() {
         // if the task is interrupted in the middle, the first time start is not set false yet,
         // so the database maybe set multiple times, so clean the database first
         mStationManager.clearStations();
@@ -158,8 +162,7 @@ public class LoadDataService extends Service {
                 station.save();
             }
             ActiveAndroid.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             ActiveAndroid.endTransaction();
         }
     }

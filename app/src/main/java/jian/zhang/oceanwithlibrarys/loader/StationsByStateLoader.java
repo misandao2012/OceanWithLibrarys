@@ -28,7 +28,7 @@ public class StationsByStateLoader extends DataLoader<List<Station>> {
     }
 
     @Override
-    public List<Station> loadInBackground() {
+    public List<Station> loadInBackground() {   // 注意基类里边还有两个callback函数, 他们是配合使用的
         if (mStateName.equals(getContext().getString(R.string.favorite_stations))) {
             return mStationManager.getStationsByFav();
         }

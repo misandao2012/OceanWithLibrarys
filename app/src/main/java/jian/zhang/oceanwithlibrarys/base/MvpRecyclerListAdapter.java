@@ -5,17 +5,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+// 数据是List的Adapter, 多是完成数据处理的函数
 public abstract class MvpRecyclerListAdapter<M, P extends BasePresenter, VH extends MvpViewHolder<P>>
         extends MvpRecyclerAdapter<M, P, VH> {
 
-    private final List<M> models;
+    private final List<M> mModels;
 
     public MvpRecyclerListAdapter() {
-        models = new ArrayList<>();
+        mModels = new ArrayList<>();
     }
 
     public void clearAndAddAll(Collection<M> data) {
-        models.clear();
+        mModels.clear();
         mPresenters.clear();
 
         for(M item: data) {
@@ -28,8 +30,8 @@ public abstract class MvpRecyclerListAdapter<M, P extends BasePresenter, VH exte
         Object modelId = getModelId(item);
 
         int position = -1;
-        for (int i = 0; i < models.size(); i++) {
-            M model = models.get(i);
+        for (int i = 0; i < mModels.size(); i++) {
+            M model = mModels.get(i);
             if (getModelId(model).equals(modelId)) {
                 position = i;
                 break;
@@ -40,18 +42,18 @@ public abstract class MvpRecyclerListAdapter<M, P extends BasePresenter, VH exte
 
     private void addInternal(M item) {
         System.err.println("Adding item " + getModelId(item));
-        models.add(item);
+        mModels.add(item);
         // 因为本class也是abstract, 不用实现createPresenter, 直接用了也可以
-        mPresenters.put(getModelId(item), createPresenter(item));
+        mPresenters.put(getModelId(item), createPresenter(item));   // 加入相应的presenter, createPresenter在这里调用的
     }
 
     @Override
     public int getItemCount() {
-        return models.size();
+        return mModels.size();
     }
 
     @Override
     protected M getItem(int position) {
-        return models.get(position);
+        return mModels.get(position);
     }
 }

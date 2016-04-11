@@ -16,7 +16,7 @@ public abstract class DataLoader<D> extends AsyncTaskLoader<D> {
     @Override
     protected void onStartLoading() {
         if (mData != null) {
-            deliverResult(mData);
+            deliverResult(mData);   // 如果数据已存在,则直接deliver result
         } else {
             forceLoad();
         }

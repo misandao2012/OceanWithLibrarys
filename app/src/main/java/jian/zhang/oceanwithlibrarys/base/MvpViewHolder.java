@@ -4,18 +4,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 public abstract class MvpViewHolder<P extends BasePresenter> extends RecyclerView.ViewHolder {
-    protected P presenter;
+    protected P mPresenter;
 
     public MvpViewHolder(View itemView) {
         super(itemView);  // notice this super
     }
 
     public void bindPresenter(P presenter) {
-        this.presenter = presenter;
+        mPresenter = presenter;
         presenter.bindView(this);
     }
 
     public void unbindPresenter() {
-        presenter = null;
+        mPresenter = null;
     }
 }
