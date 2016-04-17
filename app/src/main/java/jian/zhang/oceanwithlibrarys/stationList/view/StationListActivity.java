@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.ui.activity;
+package jian.zhang.oceanwithlibrarys.stationList.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import android.view.MenuItem;
 
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
-import jian.zhang.oceanwithlibrarys.ui.fragment.StationListFragment;
+import jian.zhang.oceanwithlibrarys.stateList.view.StateListActivity;
 
 public class StationListActivity extends AppCompatActivity {
 

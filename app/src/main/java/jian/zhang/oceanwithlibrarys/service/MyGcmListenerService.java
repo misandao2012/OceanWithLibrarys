@@ -14,7 +14,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import jian.zhang.oceanwithlibrarys.R;
-import jian.zhang.oceanwithlibrarys.ui.activity.StateListActivity;
+import jian.zhang.oceanwithlibrarys.stateList.view.StateListActivity;
 
 public class MyGcmListenerService extends GcmListenerService {
 

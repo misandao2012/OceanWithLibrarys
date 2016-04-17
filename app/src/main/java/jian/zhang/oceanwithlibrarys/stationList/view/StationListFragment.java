@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.ui.fragment;
+package jian.zhang.oceanwithlibrarys.stationList.view;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
@@ -27,11 +28,12 @@ import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
 import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailActivity;
 import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailFragment;
+import jian.zhang.oceanwithlibrarys.stationList.presenter.StationListPresenter;
 
 /**
  * Created by jian on 12/14/2015.
  */
-public class StationListFragment extends Fragment {
+public class StationListFragment extends Fragment implements StationListView {
 
 
     @Bind(R.id.station_list)
@@ -39,12 +41,20 @@ public class StationListFragment extends Fragment {
 
     private boolean mMultiplePane;
     private String mStateName;
-    private StationListLoaderCallbacks mStationListLoaderCallbacks;
+
+    private StationListPresenter mPresenter;
+
+    @Inject
+    public StationListFragment() {
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //OceanApplication.app().getOceanComponent().inject(this);
         initVariables();
+        mPresenter.attachView(this);
     }
 
     @Override
@@ -53,20 +63,23 @@ public class StationListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.station_list_fragment, container, false);
         ButterKnife.bind(this, rootView);
         setupStateNameTextView(rootView);
-        initLoader();
+        mPresenter.initLoader();
         registerFavChangedReceiver();
         return rootView;
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(onFavoriteChanged);
+        super.onDestroyView();
     }
 
-    private void initLoader() {
-        mStationListLoaderCallbacks = new StationListLoaderCallbacks();
-        getLoaderManager().initLoader(1, null, mStationListLoaderCallbacks);
+    @Override
+    public void onDestroy() {
+        // 注意这里,如果把super.onDestroy()放到后面, Loader的onReset中getView()会为null
+        // 因为detachView会把view变为null, 而且Loader中的onReset是在super.onDestroy()中调用的
+        super.onDestroy();
+        mPresenter.detachView();
     }
 
     /*
@@ -76,33 +89,28 @@ public class StationListFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             // reload the data when the favorite status changed
-            getLoaderManager().restartLoader(1, null, mStationListLoaderCallbacks);
+            mPresenter.restartLoader();
         }
     };
 
     private void initVariables() {
         mStateName = getArguments().getString(IntentExtra.STATE_NAME);
         mMultiplePane = getArguments().getBoolean(IntentExtra.MULTIPLE_PANE);
+        mPresenter = new StationListPresenter(this);
     }
 
-    private class StationListLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<Station>> {
-        @Override
-        public Loader<List<Station>> onCreateLoader(int id, Bundle bundle) {
-            return new StationsByStateLoader(getActivity(), mStateName);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<Station>> loader, List<Station> stationList) {
-            setupRecyclerViewAdapter(stationList);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<Station>> loader) {
-            mRecyclerView.setAdapter(null);
-        }
+    @Override
+    public Loader<List<Station>> createLoader() {
+        return new StationsByStateLoader(getActivity(), mStateName);  // 注意这个构造函数返回的值类型
     }
 
-    private void setupRecyclerViewAdapter(List<Station> stationList){
+    @Override
+    public void setAdapterNull(){
+        mRecyclerView.setAdapter(null);
+    }
+
+    @Override
+    public void setupRecyclerViewAdapter(List<Station> stationList){
         StationAdapter adapter = new StationAdapter(stationList);
         // if there is no favorite stations yet
         if (stationList.size() == 0 && mStateName.equals(getString(R.string.favorite_stations))) {

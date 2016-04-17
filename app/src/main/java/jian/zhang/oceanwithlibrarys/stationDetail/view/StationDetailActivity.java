@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.database.Station;
-import jian.zhang.oceanwithlibrarys.ui.activity.StationListActivity;
+import jian.zhang.oceanwithlibrarys.stationList.view.StationListActivity;
 
 /**
  * An activity representing a single Item detail screen. This

@@ -1,4 +1,4 @@
-package jian.zhang.oceanwithlibrarys.ui.activity;
+package jian.zhang.oceanwithlibrarys.stateList.view;
 
 /**
  * Created by jian on 12/14/2015.
@@ -33,7 +33,6 @@ import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
 import jian.zhang.oceanwithlibrarys.service.RegistrationIntentService;
-import jian.zhang.oceanwithlibrarys.ui.fragment.StateListFragment;
 
 public class StateListActivity extends AppCompatActivity {
 

@@ -9,7 +9,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context=".ui.activity.StationListActivity">
+    tools:context=".stationList.view.StationListActivity">
 
     <FrameLayout
         android:id="@+id/state_list_container"

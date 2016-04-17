@@ -47,7 +47,7 @@ public class LoadDataService extends Service {
     private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
 
-    private void loadData() {
+    public void loadData() {
         mCompositeSubscription.add(
                 mOceanAPI.getStations()  // Observable<List<Station>>
                         .subscribeOn(Schedulers.io())

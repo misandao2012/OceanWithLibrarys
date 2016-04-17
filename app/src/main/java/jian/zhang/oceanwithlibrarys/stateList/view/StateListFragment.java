@@ -1,9 +1,8 @@
-package jian.zhang.oceanwithlibrarys.ui.fragment;
+package jian.zhang.oceanwithlibrarys.stateList.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -29,26 +28,26 @@ import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.constants.Preference;
 import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
-import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import jian.zhang.oceanwithlibrarys.network.WebService;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
-import jian.zhang.oceanwithlibrarys.ui.activity.StateListActivity;
-import jian.zhang.oceanwithlibrarys.ui.activity.StationListActivity;
+import jian.zhang.oceanwithlibrarys.stateList.presenter.StateListPresenter;
+import jian.zhang.oceanwithlibrarys.stationList.view.StationListActivity;
+import jian.zhang.oceanwithlibrarys.stationList.view.StationListFragment;
 import jian.zhang.oceanwithlibrarys.utils.Utils;
 
 /**
  * Created by jian on 12/16/2015.
  */
-public class StateListFragment extends Fragment implements StateListActivity.Callback {
-
-    @Inject
-    StationManager mStationManager;
+public class StateListFragment extends Fragment implements StateListActivity.Callback, StateListView {
 
     @Bind(R.id.state_list)
     RecyclerView mStateRecyclerView;
 
     private boolean mMultiplePane;
     private Context mContext;
+
+    @Inject
+    StateListPresenter mPresenter;
 
     // implement callback function to open the favorite stations view
     @Override
@@ -72,8 +71,9 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OceanApplication.app().getOceanComponent().inject(this);
         setRetainInstance(true);
+        //mPresenter = new StateListPresenter();
+        OceanApplication.app().getOceanComponent().inject(this);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.state_list_fragment, container, false);
         ButterKnife.bind(this, rootView);
+        mPresenter.attachView(this);
         initRecyclerView();
         EventBus.getDefault().register(this);
         initActions();
@@ -89,15 +90,16 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        mPresenter.detachView();
         EventBus.getDefault().unregister(this);
+        super.onDestroyView();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFirstTimeLoaded(LoadDataService.FirstTimeLoadedEvent event){
         // when the data loading is finished, it will receive this event,
         // then dismiss the progress views and update the UI
-        loadData();
+        mPresenter.loadData();
     }
 
     private void initActions(){
@@ -107,7 +109,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
             Utils.lockOrientationPortrait(getActivity());
             startLoadingDataService();
         } else {
-            loadData();
+            mPresenter.loadData();
         }
     }
 
@@ -123,41 +125,13 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         }
     }
 
-    private void updateUI(List<Station> stations) {
+    @Override
+    public void updateUI(List<Station> stations) {
         StationAdapter adapter = new StationAdapter(stations);
         mStateRecyclerView.setAdapter(adapter);
         Utils.unlockOrientation(getActivity());
     }
 
-
-    private void loadData() {
-        new LoadDatabaseTask().execute();
-    }
-
-    // Load the data use a task
-    private class LoadDatabaseTask extends AsyncTask<Void, Void, List<Station>> {
-
-        @Override
-        protected void onPreExecute() {
-            if (mContext instanceof StateListActivity) {
-                ((StateListActivity) mContext).getProgressBar().setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        protected List<Station> doInBackground(Void... params) {
-            return mStationManager.getStationsGroupByState();
-        }
-
-        @Override
-        protected void onPostExecute(List<Station> stations) {
-            super.onPostExecute(stations);
-            if (mContext instanceof StateListActivity) {
-                ((StateListActivity) mContext).getProgressBar().setVisibility(View.GONE);
-            }
-            updateUI(stations);
-        }
-    }
 
     private void startLoadingDataService() {
         if (WebService.networkConnected(getActivity())) {
@@ -251,6 +225,13 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         @Override
         public int getItemCount() {
             return mStations.size();
+        }
+    }
+
+    @Override
+    public void showProgress(final boolean show) {
+        if (mContext instanceof StateListActivity) {
+            ((StateListActivity) mContext).getProgressBar().setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 

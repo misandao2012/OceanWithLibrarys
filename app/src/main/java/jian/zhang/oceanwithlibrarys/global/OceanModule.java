@@ -16,6 +16,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+// Module就是提供注入函数的地方, 相当于iOS当中的global文件
 @Module
 public class OceanModule {
     Context context;

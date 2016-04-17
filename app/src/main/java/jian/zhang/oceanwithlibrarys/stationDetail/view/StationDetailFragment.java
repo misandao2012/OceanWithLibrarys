@@ -17,24 +17,17 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
 import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.database.Station;
-import jian.zhang.oceanwithlibrarys.global.OceanApplication;
-import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import jian.zhang.oceanwithlibrarys.stationDetail.TideAdapter;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.Tide;
 import jian.zhang.oceanwithlibrarys.stationDetail.presenter.StationDetailPresenter;
 
 public class StationDetailFragment extends Fragment implements StationDetailView{
-
-    @Inject
-    StationManager mStationManager;
 
     @Bind(R.id.progress_bar)
     ProgressBar mProgressBar;
@@ -45,7 +38,7 @@ public class StationDetailFragment extends Fragment implements StationDetailView
     @Bind(R.id.fab)
     FloatingActionButton mFab;
 
-    private static final String TAG = "OceanTide";
+    private static final String TAG = StationDetailFragment.class.getSimpleName();
 
     private Station mStation;
     private TideAdapter mAdapter;
@@ -54,7 +47,6 @@ public class StationDetailFragment extends Fragment implements StationDetailView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OceanApplication.app().getOceanComponent().inject(this);
         initVariables();
     }
 
@@ -146,7 +138,7 @@ public class StationDetailFragment extends Fragment implements StationDetailView
     private void sendFavChangedBroadcast() {
         Intent intent = new Intent(IntentExtra.FAVORITE_CHANGED);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-        mStationManager.updateFavByStation(mStation);
+        mPresenter.updateFavStatus();
     }
 
     @Override

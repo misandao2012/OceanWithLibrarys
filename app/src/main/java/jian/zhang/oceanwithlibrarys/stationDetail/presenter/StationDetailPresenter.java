@@ -13,6 +13,7 @@ import jian.zhang.oceanwithlibrarys.base.BasePresenter;
 import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanAPI;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
+import jian.zhang.oceanwithlibrarys.manager.StationManager;
 import jian.zhang.oceanwithlibrarys.network.WebService;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.Tide;
 import jian.zhang.oceanwithlibrarys.stationDetail.model.TideType;
@@ -26,8 +27,12 @@ import rx.subscriptions.CompositeSubscription;
 // presenter的作用就是代表之前的activity, fragment, viewholder, 让它们只展示view, 排除和model的关系
 public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDetailView> {
 
+    // 像这样Inject进来关于数据的类一定不会出现在View或Fragment中
     @Inject
     OceanAPI mOceanAPI;
+
+    @Inject
+    StationManager mStationManager;
 
     private static final String TAG = "OceanTide";
     private boolean isLoadingData = false;
@@ -55,6 +60,10 @@ public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDet
             view().showLoading();
             loadData();
         }
+    }
+
+    public void updateFavStatus() {
+        mStationManager.updateFavByStation(mStation);
     }
 
     @Override
