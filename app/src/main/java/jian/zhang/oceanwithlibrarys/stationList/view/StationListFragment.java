@@ -22,12 +22,10 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import jian.zhang.oceanwithlibrarys.R;
-import jian.zhang.oceanwithlibrarys.constants.Constants;
 import jian.zhang.oceanwithlibrarys.constants.IntentExtra;
 import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.loader.StationsByStateLoader;
-import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailActivity;
-import jian.zhang.oceanwithlibrarys.stationDetail.view.StationDetailFragment;
+import jian.zhang.oceanwithlibrarys.stationList.StationListAdapter;
 import jian.zhang.oceanwithlibrarys.stationList.presenter.StationListPresenter;
 
 /**
@@ -111,7 +109,7 @@ public class StationListFragment extends Fragment implements StationListView {
 
     @Override
     public void setupRecyclerViewAdapter(List<Station> stationList){
-        StationAdapter adapter = new StationAdapter(stationList);
+        StationListAdapter adapter = new StationListAdapter(stationList, getActivity(), mMultiplePane);
         // if there is no favorite stations yet
         if (stationList.size() == 0 && mStateName.equals(getString(R.string.favorite_stations))) {
             Toast.makeText(getActivity(), getString(R.string.no_favorite_message), Toast.LENGTH_SHORT).show();
@@ -122,88 +120,6 @@ public class StationListFragment extends Fragment implements StationListView {
     private void registerFavChangedReceiver() {
         IntentFilter filter = new IntentFilter(IntentExtra.FAVORITE_CHANGED);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onFavoriteChanged, filter);
-    }
-
-    private class StationHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private TextView mStationNameTextView;
-        private TextView mFavoriteLabelTextView;
-        private View mItemView;
-
-        public StationHolder(View itemView) {
-            super(itemView);
-            itemView.setOnClickListener(this);
-            mStationNameTextView = (TextView) itemView.findViewById(R.id.tv_station_name);
-            mFavoriteLabelTextView = (TextView) itemView.findViewById(R.id.tv_favorite_label);
-            mItemView = itemView;
-        }
-
-        public void bindStation(Station station) {
-            mStationNameTextView.setText(station.getName());
-            if (station.getFavorite().equals(Constants.FAVORITE_TRUE)) {
-                // If the station is favorite, then mark it as RED "FAV"
-                mFavoriteLabelTextView.setVisibility(View.VISIBLE);
-            } else {
-                mFavoriteLabelTextView.setVisibility(View.INVISIBLE);
-            }
-            mItemView.setTag(station);
-        }
-
-        @Override
-        public void onClick(View view) {
-            Station station = (Station) mItemView.getTag();
-            if (mMultiplePane) {
-                // If multiple panes, then replace the fragment
-                replaceStationDetailFragment(station);
-            } else {
-                // If single pane, then start a new activity
-                startStationDetailActivity(station);
-            }
-        }
-    }
-
-    private void replaceStationDetailFragment(Station station) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(IntentExtra.STATION_PARCELABLE, station);
-        bundle.putBoolean(IntentExtra.SHOW_STATION_SUBTITLE, true);
-        StationDetailFragment fragment = new StationDetailFragment();
-        fragment.setArguments(bundle);
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.station_detail_container, fragment)
-                .commit();
-    }
-
-    private void startStationDetailActivity(Station station) {
-        Intent intent = new Intent(getActivity(), StationDetailActivity.class);
-        intent.putExtra(IntentExtra.STATION_PARCELABLE, station);
-        intent.putExtra(IntentExtra.SHOW_STATION_SUBTITLE, false);
-        getActivity().startActivity(intent);
-    }
-
-    private class StationAdapter extends RecyclerView.Adapter<StationHolder> {
-        private List<Station> mStations;
-
-        public StationAdapter(List<Station> stations) {
-            mStations = stations;
-        }
-
-        @Override
-        public StationHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(R.layout.station_list_item, parent, false);
-            return new StationHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(StationHolder holder, int position) {
-            Station station = mStations.get(position);
-            holder.bindStation(station);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mStations.size();
-        }
     }
 
     private void setupStateNameTextView(View rootView) {

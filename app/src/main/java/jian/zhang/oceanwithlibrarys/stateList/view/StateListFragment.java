@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -30,6 +29,7 @@ import jian.zhang.oceanwithlibrarys.database.Station;
 import jian.zhang.oceanwithlibrarys.global.OceanApplication;
 import jian.zhang.oceanwithlibrarys.network.WebService;
 import jian.zhang.oceanwithlibrarys.service.LoadDataService;
+import jian.zhang.oceanwithlibrarys.stateList.StateListAdapter;
 import jian.zhang.oceanwithlibrarys.stateList.presenter.StateListPresenter;
 import jian.zhang.oceanwithlibrarys.stationList.view.StationListActivity;
 import jian.zhang.oceanwithlibrarys.stationList.view.StationListFragment;
@@ -96,13 +96,13 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFirstTimeLoaded(LoadDataService.FirstTimeLoadedEvent event){
+    public void onFirstTimeLoaded(LoadDataService.FirstTimeLoadedEvent event) {
         // when the data loading is finished, it will receive this event,
         // then dismiss the progress views and update the UI
         mPresenter.loadData();
     }
 
-    private void initActions(){
+    private void initActions() {
         //check if it is the first time install the App
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (sharedPrefs.getBoolean(Preference.PREF_FIRST_TIME_START, true)) {
@@ -113,13 +113,13 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         }
     }
 
-    private void setupCallback(){
+    private void setupCallback() {
         if (mContext instanceof StateListActivity) {
             ((StateListActivity) mContext).setCallback(this);
         }
     }
 
-    private void recycleCallback(){
+    private void recycleCallback() {
         if (mContext != null && mContext instanceof StateListActivity) {
             ((StateListActivity) mContext).setCallback(null);
         }
@@ -127,7 +127,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
 
     @Override
     public void updateUI(List<Station> stations) {
-        StationAdapter adapter = new StationAdapter(stations);
+        StateListAdapter adapter = new StateListAdapter(stations, mOnClickListener, getActivity());
         mStateRecyclerView.setAdapter(adapter);
         Utils.unlockOrientation(getActivity());
     }
@@ -150,7 +150,7 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
 
 
     private void onButtonClicked(String name) {
-        if (mContext!=null && mContext instanceof StateListActivity) {
+        if (mContext != null && mContext instanceof StateListActivity) {
             mMultiplePane = ((StateListActivity) mContext).getMultiplePane();
         }
         if (mMultiplePane) {
@@ -160,6 +160,15 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
             startStationListActivity(name);
         }
     }
+
+    private final View.OnClickListener mOnClickListener = new View.OnClickListener(){
+
+        @Override
+        public void onClick(View v) {
+            String stateName = (String) v.getTag();
+            onButtonClicked(stateName);
+        }
+    };
 
     private void replaceStationListFragment(String name) {
         Bundle bundle = new Bundle();
@@ -176,56 +185,6 @@ public class StateListFragment extends Fragment implements StateListActivity.Cal
         Intent intent = new Intent(getActivity(), StationListActivity.class);
         intent.putExtra(IntentExtra.STATE_NAME, name);
         startActivity(intent);
-    }
-
-    private class StateHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private TextView mStateNameTextView;
-        private View mItemView;
-
-        public StateHolder(View itemView) {
-            super(itemView);
-            itemView.setOnClickListener(this);
-            mStateNameTextView = (TextView) itemView;
-            mItemView = itemView;
-        }
-
-        public void bindStation(Station station) {
-            mStateNameTextView.setText(station.getStateName());
-            mItemView.setTag(station.getStateName());
-        }
-
-        @Override
-        public void onClick(View v) {
-            String stateName = (String) mItemView.getTag();
-            onButtonClicked(stateName);
-        }
-    }
-
-    private class StationAdapter extends RecyclerView.Adapter<StateHolder> {
-        private List<Station> mStations;
-
-        public StationAdapter(List<Station> stations) {
-            mStations = stations;
-        }
-
-        @Override
-        public StateHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-            return new StateHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(StateHolder holder, int position) {
-            Station station = mStations.get(position);
-            holder.bindStation(station);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mStations.size();
-        }
     }
 
     @Override

@@ -28,6 +28,7 @@ import rx.subscriptions.CompositeSubscription;
 public class StationDetailPresenter extends BasePresenter<List<Tide>, StationDetailView> {
 
     // 像这样Inject进来关于数据的类一定不会出现在View或Fragment中
+    // presenter中一定不会出现任何的widget
     @Inject
     OceanAPI mOceanAPI;
 
